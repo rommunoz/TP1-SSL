@@ -9,7 +9,7 @@ int obtenerColumna(int car) {
     if (isspace(car))
         return ESPACIO;
     else if (car == EOF)
-        return FDA;
+        return FDT;
     else if (car == '0')
         return CERO;
     else if (isdigit(car))
@@ -31,62 +31,46 @@ int obtenerFila(enum Estado est){ //este enum Correccion surge de -separar en cl
         return esAceptor(est) ? 
             est - CORRECCION_ACEP : est - CORRECCION_RECH; 
     }
-    /* switch (est) {
-        case INICIAL:
-            return 0;
-        case IDENTIFICADOR:
-            return 1;
-        case ENTERO:
-            return 2;
-        case HEXADECIMAL:
-            return 3;
-        case ENTERO_MAL_FORMADO:
-            return 4;
-        case ERROR_GENERAL:
-            return 5;
-        case FDT:
-            return 6;
-    } */
 }
 
 void cargarTabla(){
-    tabla_transicion[0][2] = IDENTIFICADOR;
-    tabla_transicion[0][3] = IDENTIFICADOR;
-    tabla_transicion[0][4] = IDENTIFICADOR;
+    TT[0][2] = IDENTIFICADOR;
+    TT[0][3] = IDENTIFICADOR;
+    TT[0][4] = IDENTIFICADOR;
 
     for(int j = 0; j<5; j++)
-        tabla_transicion[1][j] = IDENTIFICADOR;
+        TT[1][j] = IDENTIFICADOR;
 
-    tabla_transicion[0][0] = ENTERO;
-    tabla_transicion[0][1] = ENTERO;
-    tabla_transicion[2][0] = ENTERO;
-    tabla_transicion[2][1] = ENTERO;
+    TT[0][0] = ENTERO;
+    TT[0][1] = ENTERO;
+    TT[2][0] = ENTERO;
+    TT[2][1] = ENTERO;
 
-    tabla_transicion[3][0] = HEXADECIMAL;
-    tabla_transicion[3][1] = HEXADECIMAL;
-    tabla_transicion[3][2] = HEXADECIMAL;
-    tabla_transicion[2][3] = HEXADECIMAL;
+    TT[3][0] = HEXADECIMAL;
+    TT[3][1] = HEXADECIMAL;
+    TT[3][2] = HEXADECIMAL;
+    TT[2][3] = HEXADECIMAL;
 
-    tabla_transicion[2][2] = ENTERO_MAL_FORMADO;
-    tabla_transicion[2][4] = ENTERO_MAL_FORMADO;
-    tabla_transicion[3][3] = ENTERO_MAL_FORMADO;
-    tabla_transicion[3][4] = ENTERO_MAL_FORMADO;
+    TT[2][2] = ENTERO_MAL_FORMADO;
+    TT[2][4] = ENTERO_MAL_FORMADO;
+    TT[3][3] = ENTERO_MAL_FORMADO;
+    TT[3][4] = ENTERO_MAL_FORMADO;
 
     for(int j = 0; j<5; j++)
-        tabla_transicion[4][j] = ENTERO_MAL_FORMADO;
+        TT[4][j] = ENTERO_MAL_FORMADO;
 
     for(int i = 0; i<6; i++)
-        tabla_transicion[i][6] = ERROR_GENERAL;
+        TT[i][6] = ERROR_GENERAL;
     for(int j = 0; j<5; j++)
-        tabla_transicion[5][j] = ERROR_GENERAL;
+        TT[5][j] = ERROR_GENERAL;
 
     for(int i = 0; i<6; i++)
-        tabla_transicion[i][7] = FDT;
+        TT[i][7] = FDA;
 
     for(int i = 0; i<7; i++)
-        tabla_transicion[i][5] = INICIAL; //podria ahorrarme esto, pero no se si es buena practica...
+        TT[i][5] = INICIAL; //podria ahorrarme esto, pero no se si es buena practica...
     for(int j = 0; j<8; j++)
-        tabla_transicion[6][j] = INICIAL;
+        TT[6][j] = INICIAL;
 }
 
 int esAceptor(int unEstado){ // despues me di cuenta que no es
@@ -114,15 +98,15 @@ void emitirLexema(enum Estado est){
         case ENTERO_MAL_FORMADO: 
             printf("Entero Mal formado '%s'\n", lexem_buffer);  
             break;
-        case FDT:
+        case FDA:
             printf("Se llego al fin de archivo.\n");  
             break;
      } 
 } 
 
-enum Estado realizarTransicion(int col){
+enum Estado realizarTransicion(short col){
     fila = obtenerFila(estado);
-    return tabla_transicion[fila][col];
+    return TT[fila][col];
 }
 
 void guardarEnLexema(int unCaracter){
@@ -147,50 +131,23 @@ void manejoDeCentinela(void){
     estado = realizarTransicion(columna);
 }
 
-bool flagPrimeraVez = true;
+bool primerLlamadoAScanner = true;
 void scanner (void) {
-    if(flagPrimeraVez){
+    if(primerLlamadoAScanner){
         cargarTabla();
-        flagPrimeraVez = false;
+        primerLlamadoAScanner = false;
     }
     caracter = getchar();
     columna = obtenerColumna(caracter);
+    
     if(columna == ESPACIO){
         manejoDeCentinela();
         //printf("Token leido: %i\n\n", token);
         //return token; //antes lo pense como que devuelve el token
         return;
     }
-    switch (estado){
-        case INICIAL:
-            estado = realizarTransicion(columna);
-            guardarEnLexema(caracter);
-            break;
 
-        case IDENTIFICADOR:
-            estado = realizarTransicion(columna);
-            guardarEnLexema(caracter);
-            break;
-        
-        case ENTERO:
-            estado = realizarTransicion(columna);
-            guardarEnLexema(caracter);
-            break;
-
-        case HEXADECIMAL: 
-            estado = realizarTransicion(columna);
-            guardarEnLexema(caracter);
-            break;
-
-        case ENTERO_MAL_FORMADO: 
-            estado = realizarTransicion(columna);
-            guardarEnLexema(caracter);  
-            break;  
-        
-        case ERROR_GENERAL:
-            estado = realizarTransicion(columna);
-            guardarEnLexema(caracter);
-            break;
-    } 
+    estado = realizarTransicion(columna);
+    guardarEnLexema(caracter);
+    return;
 }
-

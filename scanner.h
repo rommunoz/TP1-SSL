@@ -5,30 +5,30 @@
 
 enum Estado {INICIAL,
             IDENTIFICADOR = 100, ENTERO, HEXADECIMAL,
-            ENTERO_MAL_FORMADO = 200, ERROR_GENERAL, FDT};
+            ENTERO_MAL_FORMADO = 200, ERROR_GENERAL, FDA}; //FDA por fin de archivo y que no haya conflicto con columna FDT
 
 enum Estado estado = INICIAL;
 
 int caracter;
 char lexem_buffer[256+1];
-int lexbf_index = 0;
+int lexbf_index = 0; //indice del buffer
 int token = INICIAL;
-static int tabla_transicion[7][8];
+static int TT[7][8]; //Tabla de Transicion
 
 void cargarTabla(void);
 void scanner(void);
 
-enum Columna {CERO, DIGITO_NO_CERO, LETRAS_HEX,LETRA_X, RESTO_LETRAS, ESPACIO, OTROS, FDA}; //el EOF vale -1 pero su columna es la 7
+enum Columna {CERO, DIGITO_NO_CERO, LETRAS_HEX, LETRA_X, RESTO_LETRAS, ESPACIO, OTROS, FDT}; //el EOF vale -1 pero su columna es la 7
 
 short int columna = 0;
 short int fila = 0;
 
 int obtenerFila(enum Estado);
 int obtenerColumna(int);
-enum Estado realizarTransicion(int col);
 int esAceptor(int unEstado);
+void guardarEnLexema(int unCaracter);
 void emitirLexema(enum Estado est);
 void manejoDeCentinela(void);
-void guardarEnLexema(int unCaracter);
+enum Estado realizarTransicion(short col);
 
 #endif
