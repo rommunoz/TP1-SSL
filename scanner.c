@@ -104,10 +104,6 @@ void emitirLexema(enum Estado est){
      } 
 } 
 
-enum Estado realizarTransicion(short col){
-    fila = obtenerFila(estado);
-    return TT[fila][col];
-}
 
 void guardarEnLexema(int unCaracter){
     if(lexbf_index < 256+1){
@@ -129,6 +125,11 @@ void manejoDeCentinela(void){
     lexbf_index = 0;
     token = estado;
     estado = realizarTransicion(columna);
+}
+
+enum Estado realizarTransicion(short col){
+    fila = obtenerFila(estado);
+    return TT[fila][col];
 }
 
 bool primerLlamadoAScanner = true;
