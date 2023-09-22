@@ -1,12 +1,15 @@
 #ifndef scanner_h
 #define scanner_h
+#define CORRECCION_ACEP 99  //desfase de la fila segun estado aceptor
+#define CORRECCION_RECH 196 //desfase de la fila segun estado no aceptor
 
 enum Estado {INICIAL,
-            IDENTIFICADOR = 100, ENTERO, HEXADECIMAL, FDT,
-            ERROR_GENERAL = 200, ENTERO_MAL_FORMADO};
+            IDENTIFICADOR = 100, ENTERO, HEXADECIMAL,
+            ENTERO_MAL_FORMADO = 200, ERROR_GENERAL, FDT};
 
 enum Estado estado = INICIAL;
 
+int caracter;
 char lexem_buffer[256+1];
 int lexbf_index = 0;
 int token = INICIAL;

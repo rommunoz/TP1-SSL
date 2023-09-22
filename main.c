@@ -4,7 +4,7 @@
 #include "scanner.c"
 
 int main(void){
-    while(token != EOF){
+    while(token != FDT){
         scanner();
     }    
     return 0;

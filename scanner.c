@@ -24,8 +24,14 @@ int obtenerColumna(int car) {
         return OTROS;
 }
 
-int obtenerFila(enum Estado est){ //usar enum Corrccion
-    switch (est) {
+int obtenerFila(enum Estado est){ //este enum Correccion surge de 
+    if(est < 100){
+        return est;
+    } else {
+        return esAceptor(est) ? 
+            est - CORRECCION_ACEP : est - CORRECCION_RECH; 
+    }
+    /* switch (est) {
         case INICIAL:
             return 0;
         case IDENTIFICADOR:
@@ -40,7 +46,7 @@ int obtenerFila(enum Estado est){ //usar enum Corrccion
             return 5;
         case FDT:
             return 6;
-    }
+    } */
 }
 
 void cargarTabla(){
@@ -78,7 +84,7 @@ void cargarTabla(){
         tabla_transicion[i][7] = FDT;
 
     for(int i = 0; i<7; i++)
-        tabla_transicion[i][5] = INICIAL; //esto por ser una variable estatico podria no inicializar en 0
+        tabla_transicion[i][5] = INICIAL; //podria ahorrarme esto, pero no se si es buena practica...
     for(int j = 0; j<8; j++)
         tabla_transicion[6][j] = INICIAL;
 }
@@ -107,28 +113,16 @@ void emitirLexema(enum Estado est){
             break;
         case ENTERO_MAL_FORMADO: 
             printf("Entero Mal formado '%s'\n", lexem_buffer);  
-            break;    
+            break;
+        case FDT:
+            printf("Se llego al fin de archivo.\n");  
+            break;
      } 
 } 
 
 enum Estado realizarTransicion(int col){
     fila = obtenerFila(estado);
     return tabla_transicion[fila][col];
-}
-
-void manejoDeCentinela(void){
-    if(esAceptor(estado)){
-        guardarEnLexema('\0'); // indico fin de cadena
-        printf("Cadena aceptada:\n\t");
-        emitirLexema(estado);
-    } else {
-        guardarEnLexema('\0');
-        printf("Cadena \"rechazada\" (en realidad aceptada como error):\n\t");
-        emitirLexema(estado);
-    }
-    lexbf_index = 0;
-    token = estado;
-    estado = realizarTransicion(columna);
 }
 
 void guardarEnLexema(int unCaracter){
@@ -139,10 +133,21 @@ void guardarEnLexema(int unCaracter){
     }
 }
 
-//obtenerToken(estado);
-int caracter;
-bool flagPrimeraVez = true;
+void manejoDeCentinela(void){
+    if(esAceptor(estado)){
+        guardarEnLexema('\0'); // indico fin de cadena
+        //printf("Cadena aceptada:\n\t");
+        emitirLexema(estado);
+    } else {
+        guardarEnLexema('\0');
+        emitirLexema(estado);
+    }
+    lexbf_index = 0;
+    token = estado;
+    estado = realizarTransicion(columna);
+}
 
+bool flagPrimeraVez = true;
 void scanner (void) {
     if(flagPrimeraVez){
         cargarTabla();
@@ -150,10 +155,10 @@ void scanner (void) {
     }
     caracter = getchar();
     columna = obtenerColumna(caracter);
-    if(caracter == EOF || columna == ESPACIO){
+    if(columna == ESPACIO){
         manejoDeCentinela();
-        printf("Token leido: %i\n\n", token);
-        //return token;
+        //printf("Token leido: %i\n\n", token);
+        //return token; //antes lo pense como que devuelve el token
         return;
     }
     switch (estado){
