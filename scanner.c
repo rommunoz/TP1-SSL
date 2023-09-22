@@ -24,7 +24,7 @@ int obtenerColumna(int car) {
         return OTROS;
 }
 
-int obtenerFila(enum Estado est){ //este enum Correccion surge de 
+int obtenerFila(enum Estado est){ //este enum Correccion surge de -separar en clases los estados- 
     if(est < 100){
         return est;
     } else {
