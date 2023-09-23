@@ -33,43 +33,44 @@ int obtenerFila(enum Estado est){ //este enum Correccion surge de -separar en cl
 }
 
 void cargarTabla(){
-    TT[0][2] = IDENTIFICADOR;
-    TT[0][3] = IDENTIFICADOR;
-    TT[0][4] = IDENTIFICADOR;
+    TT[INICIAL][LETRAS_HEX] = IDENTIFICADOR;
+    TT[INICIAL][LETRA_X] = IDENTIFICADOR;
+    TT[INICIAL][RESTO_LETRAS] = IDENTIFICADOR;
 
     for(int j = 0; j<5; j++)
         TT[1][j] = IDENTIFICADOR;
 
-    TT[0][0] = ENTERO;
-    TT[0][1] = ENTERO;
-    TT[2][0] = ENTERO;
-    TT[2][1] = ENTERO;
+    TT[INICIAL][CERO] = ENTERO;
+    TT[INICIAL][DIGITO_NO_CERO] = ENTERO;
+    TT[ENTERO - CORRECCION_ACEP][CERO] = ENTERO;
+    TT[ENTERO - CORRECCION_ACEP][DIGITO_NO_CERO] = ENTERO;
 
-    TT[3][0] = HEXADECIMAL;
-    TT[3][1] = HEXADECIMAL;
-    TT[3][2] = HEXADECIMAL;
-    TT[2][3] = HEXADECIMAL;
+    TT[HEXADECIMAL - CORRECCION_ACEP][CERO] = HEXADECIMAL;
+    TT[HEXADECIMAL - CORRECCION_ACEP][DIGITO_NO_CERO] = HEXADECIMAL;
+    TT[HEXADECIMAL - CORRECCION_ACEP][LETRAS_HEX] = HEXADECIMAL;
+    TT[ENTERO - CORRECCION_ACEP][LETRA_X] = HEXADECIMAL;
 
-    TT[2][2] = ENTERO_MAL_FORMADO;
-    TT[2][4] = ENTERO_MAL_FORMADO;
-    TT[3][3] = ENTERO_MAL_FORMADO;
-    TT[3][4] = ENTERO_MAL_FORMADO;
+    TT[ENTERO - CORRECCION_ACEP][LETRAS_HEX] = ENTERO_MAL_FORMADO;
+    TT[ENTERO - CORRECCION_ACEP][RESTO_LETRAS] = ENTERO_MAL_FORMADO;
+    TT[HEXADECIMAL - CORRECCION_ACEP][LETRAS_HEX] = ENTERO_MAL_FORMADO;
+    TT[HEXADECIMAL - CORRECCION_ACEP][RESTO_LETRAS] = ENTERO_MAL_FORMADO;
 
-    for(int j = 0; j<5; j++)
-        TT[4][j] = ENTERO_MAL_FORMADO;
+    //utilizamos for para rellenar la tabla y acortar el codigo
+    for(int j = CERO; j<ESPACIO; j++)
+        TT[ENTERO_MAL_FORMADO - CORRECCION_RECH][j] = ENTERO_MAL_FORMADO;
 
-    for(int i = 0; i<6; i++)
+    for(int i = CERO; i<OTROS; i++)
         TT[i][6] = ERROR_GENERAL;
-    for(int j = 0; j<5; j++)
-        TT[5][j] = ERROR_GENERAL;
+    for(int j = CERO; j<ESPACIO; j++)
+        TT[ERROR_GENERAL - CORRECCION_RECH][j] = ERROR_GENERAL;
 
-    for(int i = 0; i<6; i++)
-        TT[i][7] = FDA;
+    for(int i = CERO; i<OTROS; i++)
+        TT[i][FDT] = FDA;
 
-    for(int i = 0; i<7; i++)
-        TT[i][5] = INICIAL; //podria ahorrarme esto, pero no se si es buena practica...
-    for(int j = 0; j<8; j++)
-        TT[6][j] = INICIAL;
+    for(int i = CERO; i<FDT; i++)
+        TT[i][ESPACIO] = INICIAL; //podria ahorrarme esto, pero no se si es buena practica...
+    for(int j = CERO; j<FDT+1; j++) //
+        TT[FDA - CORRECCION_RECH][j] = INICIAL;
 }
 
 int esAceptor(int unEstado){ // no se pide informar, pero me sirve
@@ -89,7 +90,7 @@ void emitirLexema(enum Estado est){
             printf("Entero '%s'\n", lexem_buffer);
             break;
         case INICIAL: 
-            printf("Espacio '%s'\n", lexem_buffer); 
+            //printf("Espacio '%s'\n", lexem_buffer); 
             break;
         case HEXADECIMAL: 
             printf("Hexadecimal '%s'\n", lexem_buffer); 
@@ -103,11 +104,14 @@ void emitirLexema(enum Estado est){
      } 
 } 
 
+//bool estaLlenoElBuffer = false;
+
 void guardarEnLexema(int unCaracter){
-    if(lexbf_index < 256+1){
+    if(lexbf_index < 256){ //dejo un lugar para el '\0'
         lexem_buffer[lexbf_index++] = unCaracter;
     } else {
         printf("El buffer del lexema se llenó ");
+        //estaLlenoElBuffer = true;
     }
 }
 
@@ -146,6 +150,7 @@ void scanner (void) {
     }
 
     estado = realizarTransicion(columna);
+    //if(!estaLlenoElBuffer)
     guardarEnLexema(caracter);
     return;
 }

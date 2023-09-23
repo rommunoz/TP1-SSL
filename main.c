@@ -6,6 +6,6 @@
 int main(void){
     while(token != FDA){
         scanner();
-    }    
+    }
     return 0;
 }

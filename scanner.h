@@ -9,11 +9,14 @@ enum Estado {INICIAL,
 
 enum Estado estado = INICIAL;
 
+enum Dimensiones {FILAS = 7, COLUMNAS = 8};
+
 int caracter;
-char lexem_buffer[256+1];
+char lexem_buffer[256+1]; //+1 para el '\0'
 int lexbf_index = 0; //indice del buffer
 int token = INICIAL;
-static int TT[7][8]; //Tabla de Transicion
+static int TT[FILAS][COLUMNAS]; //Tabla de Transicion
+
 
 void cargarTabla(void);
 void scanner(void);
