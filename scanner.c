@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-
 int obtenerColumna(int car) {
     if (isspace(car))
         return ESPACIO;
@@ -73,7 +72,7 @@ void cargarTabla(){
         TT[6][j] = INICIAL;
 }
 
-int esAceptor(int unEstado){ // despues me di cuenta que no es
+int esAceptor(int unEstado){ // no se pide informar, pero me sirve
     return 100 <= unEstado && unEstado < 200 ? 1 : 0; 
 }
 
@@ -104,7 +103,6 @@ void emitirLexema(enum Estado est){
      } 
 } 
 
-
 void guardarEnLexema(int unCaracter){
     if(lexbf_index < 256+1){
         lexem_buffer[lexbf_index++] = unCaracter;
@@ -126,11 +124,12 @@ enum Estado realizarTransicion(short col){
     return TT[fila][col];
 }
 
-bool primerLlamadoAScanner = true;
+bool esPrimerLlamadoAScanner = true;
+
 void scanner (void) {
-    if(primerLlamadoAScanner){
+    if(esPrimerLlamadoAScanner){
         cargarTabla();
-        primerLlamadoAScanner = false;
+        esPrimerLlamadoAScanner = false;
     }
     caracter = getchar();
     columna = obtenerColumna(caracter);
