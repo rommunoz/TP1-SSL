@@ -8,7 +8,7 @@
 int obtenerColumna(int car) {
     if (isspace(car))
         return ESPACIO;
-    else if (car == EOF)
+    else if (car == EOF || car == 26) //haciendo debug 
         return FDT;
     else if (car == '0')
         return CERO;
@@ -114,14 +114,8 @@ void guardarEnLexema(int unCaracter){
 }
 
 void manejoDeCentinela(void){
-    if(esAceptor(estado)){
-        guardarEnLexema('\0'); // indico fin de cadena
-        //printf("Cadena aceptada:\n\t");
-        emitirLexema(estado);
-    } else {
-        guardarEnLexema('\0');
-        emitirLexema(estado);
-    }
+    guardarEnLexema('\0'); // indico fin de cadena
+    emitirLexema(estado);
     lexbf_index = 0;
     token = estado;
     estado = realizarTransicion(columna);
@@ -143,8 +137,12 @@ void scanner (void) {
     
     if(columna == ESPACIO){
         manejoDeCentinela();
-        //printf("Token leido: %i\n\n", token);
-        //return token; //antes lo pense como que devuelve el token
+        return;
+    }
+    
+    if(columna == FDT){
+        manejoDeCentinela();
+        ungetc(caracter, stdin);
         return;
     }
 
