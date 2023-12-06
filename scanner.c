@@ -84,12 +84,11 @@ int scanner (void) {
 
     if(columna == ESPACIO){
         manejoDeCentinela();
-        estado = INICIAL;
     }
 
     if(columna == FDT){
         manejoDeCentinela();
-        ungetc(caracter, stdin);
+        ungetc(caracter, stdin); //para la proxima vuelta
     }
 
     deboParar = false;
