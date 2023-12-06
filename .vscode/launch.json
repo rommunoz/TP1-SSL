@@ -23,7 +23,7 @@
 			}
 		    ],
 		    "preLaunchTask": "C/C++: gcc compilar archivo activo",
-		    "miDebuggerPath": "/usr/bin/gdb"
+		    "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
 		}
 	    ]
 }
