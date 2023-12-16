@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+//Tabla de Transicion
 static int TT[FILAS][COLUMNAS] = {
+//                 CERO           [1-9]          [A-Fa-f]       [xX]           [E-Ze-z]       espacios       EOF            otros    
 /*INICIAL*/       {ENTERO_CERO,   ENTERO,        IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, INICIAL,       FDA,           ERROR_GENERAL},
 /*ENTERO_CERO*/   {ENTERO,        ENTERO,        ENT_MAL_FORM,  HEXADECIMAL,   ENT_MAL_FORM,  ENTERO_CERO,   ENTERO_CERO,   ERROR_GENERAL},
 /*ENTERO*/        {ENTERO,        ENTERO,        ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENTERO,        ENTERO,        ERROR_GENERAL},
@@ -12,13 +14,15 @@ static int TT[FILAS][COLUMNAS] = {
 /*IDENTIFICADOR*/ {IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, ERROR_GENERAL},
 /*ENT_MAL_FORM*/  {ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ERROR_GENERAL},
 /*ERROR_GENERAL*/ {ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL},
-/*FDA*/           {FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA}
-};
+/*FDA*/           {FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA          }
+}; 
 
-static int columna = 0;
+int columna = 0;
 bool deboParar = false;
 enum Token estado = INICIAL;
 char lexem_buffer[512+1] = {0};
+static int lexbf_index = 0; //indice del buffer
+static int caracter;
 
 int obtenerColumna(int car) {
     if (isspace(car)){
@@ -45,20 +49,18 @@ int esAceptor(int unEstado){ // queda magico pero despues se puede arreglar o sa
     return ENTERO_CERO <= unEstado && unEstado < IDENTIFICADOR ? 1 : 0; 
 }
 
+int esCentinela(int c){
+    return c == ESPACIO || c == FDT;
+}
+
 void guardarEnLexema(int unCaracter){
     if(lexbf_index < 512){ //dejo un lugar para el '\0'
         lexem_buffer[lexbf_index++] = unCaracter;
     } else {
         printf("El buffer del lexema se llenó ");
-        manejoDeCentinela();
         //estaLlenoElBuffer = true;
     }
 }
-
-int esCentinela(int c){
-    return c == ESPACIO || c == FDT;
-}
-
 
 void manejoDeCentinela(){
     guardarEnLexema('\0'); // indico fin de cadena
@@ -66,6 +68,7 @@ void manejoDeCentinela(){
     token = estado;
     estado = INICIAL;
 }
+
 
 enum Token realizarTransicion(int car){
     return TT[estado][car];
