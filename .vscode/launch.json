@@ -5,7 +5,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-		    "name": "gcc - Compilar y depurar el archivo activo",
+		    "name": "gcc -- Compilar y depurar el archivo activo",
 		    "type": "cppdbg",
 		    "request": "launch",
 		    "program": "${fileDirname}/${workspaceFolderBasename}",
@@ -23,7 +23,7 @@
 			}
 		    ],
 		    "preLaunchTask": "C/C++: gcc compilar archivo activo",
-		    "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
+		    "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe"
 		}
 	    ]
 }

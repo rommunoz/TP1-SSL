@@ -7,14 +7,14 @@
 //Tabla de Transicion
 static int TT[FILAS][COLUMNAS] = {
 //                 CERO           [1-9]          [A-Fa-f]       [xX]           [E-Ze-z]       espacios       EOF            otros    
-/*INICIAL*/       {ENTERO_CERO,   ENTERO,        IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, INICIAL,       FDA,           ERROR_GENERAL},
-/*ENTERO_CERO*/   {ENTERO,        ENTERO,        ENT_MAL_FORM,  HEXADECIMAL,   ENT_MAL_FORM,  ENTERO_CERO,   ENTERO_CERO,   ERROR_GENERAL},
-/*ENTERO*/        {ENTERO,        ENTERO,        ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENTERO,        ENTERO,        ERROR_GENERAL},
-/*HEXADECIMAL*/   {HEXADECIMAL,   HEXADECIMAL,   HEXADECIMAL,   ENT_MAL_FORM,  ENT_MAL_FORM,  HEXADECIMAL,   HEXADECIMAL,   ERROR_GENERAL},
-/*IDENTIFICADOR*/ {IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, ERROR_GENERAL},
-/*ENT_MAL_FORM*/  {ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ERROR_GENERAL},
-/*ERROR_GENERAL*/ {ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL},
-/*FDA*/           {FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA          }
+/*INICIAL*/       {ENTERO_CERO,   ENTERO,        IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, INICIAL,       FDA,           ERROR_GENERAL   },
+/*ENTERO_CERO*/   {ENTERO,        ENTERO,        ENT_MAL_FORM,  HEXADECIMAL,   ENT_MAL_FORM,  ENTERO_CERO,   ENTERO_CERO,   ENTERO_CERO     },
+/*ENTERO*/        {ENTERO,        ENTERO,        ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENTERO,        ENTERO,        ENTERO          },
+/*HEXADECIMAL*/   {HEXADECIMAL,   HEXADECIMAL,   HEXADECIMAL,   HEXADECIMAL ,  HEXADECIMAL ,  HEXADECIMAL,   HEXADECIMAL,   HEXADECIMAL     },
+/*IDENTIFICADOR*/ {IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR, IDENTIFICADOR   },
+/*ENT_MAL_FORM*/  {ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM,  ENT_MAL_FORM    },
+/*ERROR_GENERAL*/ {ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL, ERROR_GENERAL   },
+/*FDA*/           {FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA,           FDA             }
 }; 
 
 int columna = 0;
@@ -26,10 +26,8 @@ static int caracter;
 
 int obtenerColumna(int car) {
     if (isspace(car)){
-        deboParar = true;
         return ESPACIO; //5
     } else if (car == EOF){ 
-        deboParar = true;
         return FDT; //6
     } else if (car == '0')
         return CERO;//0
@@ -50,7 +48,8 @@ int esAceptor(int unEstado){ // queda magico pero despues se puede arreglar o sa
 }
 
 int esCentinela(int c){
-    return c == ESPACIO || c == FDT;
+    return c == ESPACIO || c == FDT || (c == RESTO_LETRAS && estado == HEXADECIMAL)
+        || (c == OTROS && estado != INICIAL && estado != ERROR_GENERAL);
 }
 
 void guardarEnLexema(int unCaracter){
@@ -82,16 +81,13 @@ int scanner (void) {
         if (!esCentinela(columna)){
             guardarEnLexema(caracter);
         }
+        deboParar = esCentinela(columna); 
         estado = realizarTransicion(columna);
     }
 
-    if(columna == ESPACIO){
-        manejoDeCentinela();
-    }
-
-    if(columna == FDT){
-        manejoDeCentinela();
-        ungetc(caracter, stdin); //para la proxima vuelta
+    manejoDeCentinela();
+    if(columna != ESPACIO){
+        ungetc(caracter, stdin); //devuelvo cualquier centinela que no sea espacio para la proxima vuelta
     }
 
     deboParar = false;

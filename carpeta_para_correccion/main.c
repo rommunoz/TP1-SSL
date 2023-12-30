@@ -11,7 +11,10 @@ int main(void){
             case IDENTIFICADOR:
                 printf("Identificador '%s'\n", lexem_buffer);
                 break;
-            case (ENTERO || ENTERO_CERO):
+            case (ENTERO_CERO):
+                printf("Entero '%s'\n", lexem_buffer);
+                break;
+            case (ENTERO):
                 printf("Entero '%s'\n", lexem_buffer);
                 break;
             case HEXADECIMAL: 
